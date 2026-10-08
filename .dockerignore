@@ -1,0 +1,10 @@
+.git
+.gitignore
+node_modules
+.codegraph
+.playwright-mcp
+.omo
+config.json
+token api.txt
+**/*.log
+README.md

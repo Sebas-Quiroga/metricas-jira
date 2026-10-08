@@ -1,0 +1,25 @@
+services:
+  proxy:
+    build:
+      context: .
+      dockerfile: docker/proxy.Dockerfile
+    container_name: metricas-proxy
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8787
+    volumes:
+      - ./config.json:/app/config.json:ro
+    ports:
+      - "8787:8787"
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+    container_name: metricas-web
+    depends_on:
+      - proxy
+    ports:
+      - "1483:1483"
+    restart: unless-stopped

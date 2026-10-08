@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="src/estilos/logo-metricas.svg" />
+    <title>Métricas Jira · ITM</title>
+    <link rel="stylesheet" href="src/estilos/principal.css" />
+  </head>
+  <body>
+    <header class="cabecera">
+      <div class="marca">
+        <img class="isotipo" src="src/estilos/logo-metricas.svg" alt="Logo de métricas" width="38" height="38" />
+        <div>
+          <h1>Métricas por tablero</h1>
+          <p id="marcaSubtitulo">Jira Cloud · itmerp.atlassian.net</p>
+        </div>
+      </div>
+      <div class="sesion">
+        <span id="usuarioConexion" class="usuario"></span>
+        <button id="botonConfig" class="boton-config" type="button" title="Credenciales de Jira">⚙</button>
+        <button
+          id="luzConexion"
+          class="luz luz-cargando"
+          type="button"
+          title="Conectando…"
+          aria-label="Estado de conexión"
+        ></button>
+      </div>
+    </header>
+
+    <main>
+      <div id="vistaListado">
+        <section class="controles">
+          <select id="filtroPersona" class="selector">
+            <option value="">Todas las personas</option>
+          </select>
+          <select id="filtroProyecto" class="selector">
+            <option value="">Todos los proyectos</option>
+          </select>
+          <button id="botonLimpiar" class="boton">Limpiar filtros</button>
+          <button id="botonInforme" class="boton" type="button">Crear informe</button>
+          <div class="resumen">
+            <span><strong id="conteoVisibles">0</strong> visibles</span>
+            <span><strong id="conteoSeleccionados">0</strong> seleccionados</span>
+            <button id="botonMetricas" class="boton" disabled>Calcular métricas</button>
+          </div>
+        </section>
+
+        <div id="mensajeEstado" class="aviso oculto"></div>
+
+        <section id="cuadriculaTableros" class="cuadricula"></section>
+      </div>
+
+      <section id="vistaDetalle" class="oculto">
+        <div class="detalle-cabecera">
+          <button id="botonVolver" class="boton" type="button">← Tableros</button>
+          <div class="detalle-titular">
+            <h2 id="detalleTitulo">Tablero</h2>
+            <p id="detalleSubtitulo"></p>
+          </div>
+          <span id="detalleEstadoCarga" class="chip"></span>
+        </div>
+
+        <div class="controles">
+          <input
+            id="detalleBusqueda"
+            class="campo"
+            type="search"
+            placeholder="Buscar por clave o resumen…"
+            autocomplete="off"
+          />
+          <select id="detalleAsignado" class="selector">
+            <option value="">Todas las personas</option>
+          </select>
+          <select id="detalleTipo" class="selector">
+            <option value="">Todos los tipos</option>
+          </select>
+          <details class="multiselect" id="detalleEstadosContenedor">
+            <summary class="selector" id="detalleEstadoResumen">Todos los estados</summary>
+            <div class="multiselect-panel" id="detalleEstadosPanel"></div>
+          </details>
+          <button id="botonLimpiarDetalle" class="boton" type="button">Limpiar</button>
+          <div class="resumen">
+            <span><strong id="detalleConteo">0</strong> tarjetas</span>
+          </div>
+        </div>
+
+        <div id="detalleAviso" class="aviso oculto"></div>
+
+        <div id="detalleColumnas" class="columnas"></div>
+      </section>
+    </main>
+
+    <div id="modalRecorrido" class="modal-fondo oculto">
+      <div class="modal-panel" role="dialog" aria-modal="true">
+        <div class="modal-cabecera">
+          <div>
+            <h3 id="recorridoClave">—</h3>
+            <p id="recorridoResumen"></p>
+          </div>
+          <button id="botonCerrarRecorrido" class="boton" type="button">Cerrar</button>
+        </div>
+        <div id="recorridoCuerpo" class="modal-cuerpo"></div>
+      </div>
+    </div>
+
+    <div id="modalInforme" class="modal-fondo oculto">
+      <div class="modal-panel modal-informe" role="dialog" aria-modal="true">
+        <div class="modal-cabecera">
+          <div>
+            <h3>Crear informe</h3>
+            <p>Selecciona tipo de informe, persona asignada y periodo con el calendario.</p>
+          </div>
+          <button id="botonCerrarInforme" class="boton" type="button">Cerrar</button>
+        </div>
+        <div class="modal-cuerpo">
+          <div class="informe-controles">
+            <label class="informe-campo">
+              Tipo de informe
+              <select id="informeTipo" class="selector">
+                <option value="finalizadas">Finalizadas por tablero</option>
+                <option value="tiempo">Tiempo por tarjeta</option>
+              </select>
+            </label>
+            <label class="informe-campo">
+              Persona asignada
+              <select id="informePersona" class="selector">
+                <option value="">Todas las personas</option>
+              </select>
+            </label>
+            <label class="informe-campo">
+              Inicio
+              <input id="informeInicio" class="campo" type="date" autocomplete="off" />
+            </label>
+            <label class="informe-campo">
+              Fin
+              <input id="informeFin" class="campo" type="date" autocomplete="off" />
+            </label>
+            <button id="botonGenerarInforme" class="boton boton-primario" type="button">Generar</button>
+            <button id="botonExportarExcel" class="boton" type="button" disabled>Excel</button>
+            <button id="botonExportarPdf" class="boton" type="button" disabled>PDF</button>
+          </div>
+          <div id="informeAviso" class="aviso oculto"></div>
+          <div id="informeResultado"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="modalConfig" class="modal-fondo oculto">
+      <div class="modal-panel modal-config" role="dialog" aria-modal="true">
+        <div class="modal-cabecera">
+          <div>
+            <h3>Credenciales de Jira</h3>
+            <p>Se guardan solo en este navegador. Si están vacías, el proxy usa su config.json.</p>
+          </div>
+          <button id="botonCerrarConfig" class="boton" type="button">Cerrar</button>
+        </div>
+        <div class="modal-cuerpo">
+          <div class="config-campos">
+            <label class="informe-campo">
+              URL de Jira
+              <input id="configUrl" class="campo" type="url" placeholder="https://itmerp.atlassian.net" autocomplete="off" />
+            </label>
+            <label class="informe-campo">
+              Correo
+              <input id="configEmail" class="campo" type="email" placeholder="tu-correo@empresa.com" autocomplete="off" />
+            </label>
+            <label class="informe-campo">
+              Token de API
+              <input id="configToken" class="campo" type="password" placeholder="ATATT…" autocomplete="off" />
+            </label>
+          </div>
+          <div id="configAviso" class="aviso oculto"></div>
+          <div class="config-acciones">
+            <button id="botonGuardarConfig" class="boton boton-primario" type="button">Guardar y conectar</button>
+            <button id="botonLimpiarConfig" class="boton" type="button">Borrar credenciales</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="pie">
+      El navegador habla con el proxy local (<code>127.0.0.1:8787</code>), que sí tiene permiso para
+      llamar a Jira. Arráncalo con <code>node proxy.js</code>.
+    </footer>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>
